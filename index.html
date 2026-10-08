@@ -148,6 +148,10 @@ a{color:inherit}
 .refs .sep{color:#b4c6e8;font-size:12px}
 .refs a{color:#fff;text-decoration:underline;text-decoration-color:rgba(143,216,255,.5);text-underline-offset:3px;overflow-wrap:anywhere}
 .refs a:hover{text-decoration-color:var(--red)}
+.react{margin:0}
+.react a{display:inline-block;font-size:13px;color:#fff;text-decoration:none;background:rgba(143,216,255,.12);border:1px solid rgba(143,216,255,.4);border-radius:999px;padding:4px 12px}
+.react a:hover{background:rgba(143,216,255,.22)}
+.detail .refs+.refh,.detail .react+.refh{margin-top:14px}
 .tags{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
 .detail .refs+.refh,.detail .note+.refh{margin-top:14px}
 .tags a{display:inline-block;font-size:13px;font-weight:700;color:var(--pink);text-decoration:none;background:rgba(255,143,200,.12);border:1px solid rgba(255,143,200,.35);border-radius:999px;padding:3px 11px}
@@ -325,11 +329,26 @@ function xsearch(t,d){   /* その出来事の日から2日間に絞ってXを�
   var q='#'+t,p=d.split('-');
   if(p.length===3){var a=new Date(Date.UTC(+p[0],+p[1]-1,+p[2])),b=new Date(a.getTime()+2*864e5);q+=' since:'+a.toISOString().slice(0,10)+' until:'+b.toISOString().slice(0,10);}
   return 'https://x.com/search?q='+encodeURIComponent(q)+'&f=live';}
+function reactHTML(e){   /* 当時のTwitter/Xの反応：「でんぱ」「でんぱ組」を含む投稿を、出来事の当日と翌日で検索（ユウジ指示） */
+  var p=e.date.split('-'),q,lab;
+  if(p.length===2){   /* 日付が月までしか分からない出来事は、その月まるごとで検索 */
+    var m0=new Date(Date.UTC(+p[0],+p[1]-1,1)),m1=new Date(Date.UTC(+p[0],+p[1],1));
+    q='("でんぱ" OR "でんぱ組") since:'+m0.toISOString().slice(0,10)+' until:'+m1.toISOString().slice(0,10);
+    return '<h5 class="refh">当時のTwitter/Xの反応</h5><p class="react"><a href="https://x.com/search?q='+encodeURIComponent(q)+'" target="_blank" rel="noopener">「でんぱ」「でんぱ組」を含む投稿（'+(+p[1])+'月中）↗</a></p>';}
+  if(p.length<3)return '';
+  var a=new Date(Date.UTC(+p[0],+p[1]-1,+p[2])),l=(e.date_last||e.date).split('-');
+  var z=l.length===3?new Date(Date.UTC(+l[0],+l[1]-1,+l[2])):a,b=new Date(z.getTime()+2*864e5);
+  q='("でんぱ" OR "でんぱ組") since:'+a.toISOString().slice(0,10)+' until:'+b.toISOString().slice(0,10);
+  var c=new Date(b.getTime()-864e5);   /* until: はその日を含まない。表示は実際に含まれる最終日 */
+  lab=(a.getUTCMonth()+1)+'/'+a.getUTCDate()+'〜'+(c.getUTCMonth()+1)+'/'+c.getUTCDate();
+  return '<h5 class="refh">当時のTwitter/Xの反応</h5><p class="react"><a href="https://x.com/search?q='+encodeURIComponent(q)+'" target="_blank" rel="noopener">「でんぱ」「でんぱ組」を含む投稿（'+lab+'）↗</a></p>';}
 function detailHTML(y,e){
   /* 参考URL：「出典元の名前：リンク」を縦に並べる。Wikipediaは全件同じ記事なので行の札（WP）だけで示す */
   var L=[];Object.keys(SRC).forEach(function(c){e.src.forEach(function(s){if(s.c===c&&c!=='wikipedia')L.push(s);});});
   var T=e.tags?'<h5 class="refh">ハッシュタグ</h5><ul class="tags">'+e.tags.map(function(t){
       return '<li><a href="'+xsearch(t,e.date)+'" target="_blank" rel="noopener">#'+esc(t)+' ↗</a></li>';}).join('')+'</ul>':'';
+  var R=reactHTML(e);
+  T=R+T;
   if(!L.length)return '<div class="detail"><p class="note">Wikipedia「でんぱ組.inc」にだけ載っている出来事です。</p>'+T+'</div>';
   return '<div class="detail"><h5 class="refh">参考URL</h5><ul class="refs">'+L.map(function(s){
     var name=s.c==='media'?s.n:(s.n||SRC[s.c]),text;
