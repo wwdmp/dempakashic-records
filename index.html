@@ -54,7 +54,8 @@ a{color:inherit}
 .hero .stat{position:relative;display:flex;flex-wrap:wrap;gap:6px 22px;margin:0;font-size:12.5px;color:var(--muted);letter-spacing:.04em}
 .hero .stat b{color:var(--ink);font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;margin-right:4px}
 .navlinks .short{display:none}
-@media (max-width:640px){.navlinks a{padding:6px 8px}.navlinks .hide-sp{display:none}.navlinks .full{display:none}.navlinks .short{display:inline}}
+@media (max-width:640px){.navin{gap:6px}.logo{font-size:12.5px;gap:5px;letter-spacing:0}.logo svg{width:18px;height:18px}.navlinks{gap:0}.navlinks a{padding:5px 7px;font-size:12px}.navlinks .full{display:none}.navlinks .short{display:inline}}
+@media (max-width:350px){.navlinks .hide-xs{display:none}}
 .nav{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .btn{font:inherit;font-size:13px;color:var(--ink);background:rgba(255,255,255,.04);border:1px solid var(--rule);border-radius:6px;padding:6px 12px;cursor:pointer;text-decoration:none}
 .btn:hover{border-color:var(--ink2)}
@@ -182,7 +183,7 @@ dialog#about::backdrop{background:rgba(6,6,20,.66);backdrop-filter:blur(3px)}
     <a class="logo" href="./" id="home" aria-label="でんぱぁかしっくれこーど.net 最初の画面へ">
       <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M19.4 2.8 7.6 18h6.8l-2.7 11.2L24.4 14h-7l2-11.2z" fill="#f08cbc"/></svg>
       <span>でんぱぁかしっくれこーど.net</span></a>
-    <div class="navlinks"><a href="#ov" data-jump="ov" class="hide-sp">年表</a><a href="#zm" data-jump="zm" class="hide-sp">出来事一覧</a><a href="#about" id="about-open"><span class="full">この年表について</span><span class="short">について</span></a></div>
+    <div class="navlinks"><a href="#ov" data-jump="ov" class="hide-xs">年表</a><a href="#zm" data-jump="zm"><span class="full">出来事一覧</span><span class="short">一覧</span></a><a href="#about" id="about-open"><span class="full">この年表について</span><span class="short">概要</span></a></div>
   </div></nav>
 <header class="top">
 
