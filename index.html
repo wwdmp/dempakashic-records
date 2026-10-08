@@ -329,19 +329,29 @@ function xsearch(t,d){   /* その出来事の日から2日間に絞ってXを�
   var q='#'+t,p=d.split('-');
   if(p.length===3){var a=new Date(Date.UTC(+p[0],+p[1]-1,+p[2])),b=new Date(a.getTime()+2*864e5);q+=' since:'+a.toISOString().slice(0,10)+' until:'+b.toISOString().slice(0,10);}
   return 'https://x.com/search?q='+encodeURIComponent(q)+'&f=live';}
+/* 出演者の本名とあだ名（ユウジ確定 2026-10-08）。出演者欄の表記ゆれ（ピンキー等）も本人に寄せる */
+var ALIAS={'古川未鈴':['古川未鈴','未鈴ちゃん','みりんちゃん'],'相沢梨紗':['相沢梨紗','りさちー','梨紗ちゃん'],'夢眠ねむ':['夢眠ねむ','ねむきゅん'],
+  '成瀬瑛美':['成瀬瑛美','えいたそ'],'最上もが':['最上もが','もがちゃん'],'藤咲彩音':['藤咲彩音','ピンキー'],'鹿目凛':['鹿目凛','ぺろりん'],
+  '根本凪':['根本凪','ねもちゃん'],'愛川こずえ':['愛川こずえ','こずこず'],'天沢璃人':['天沢璃人','りとくん'],'小鳩りあ':['小鳩りあ','りあちゃん','りあぴ'],
+  '空野青空':['空野青空','あおにゃん'],'高咲陽菜':['高咲陽菜','ひなちゃん','ひなどりーむ'],'跡部みぅ':['跡部みぅ'],'小和田あかり':['小和田あかり']};
+var PERF_AS={'ピンキー':'藤咲彩音','えいたそ':'成瀬瑛美','西村めめ':'相沢梨紗'};
+function reactTerms(e){var t=['でんぱ','でんぱ組'];
+  e.perf.forEach(function(p){var m=ALIAS[PERF_AS[p]||p];if(m)m.forEach(function(x){if(t.indexOf(x)<0)t.push(x);});});
+  return '('+t.map(function(x){return '"'+x+'"';}).join(' OR ')+')';}
+function reactLabel(e){return '「でんぱ組」やメンバー名を含む投稿';}   /* 表示は全出来事で共通（ユウジ指示） */
 function reactHTML(e){   /* 当時のTwitter/Xの反応：「でんぱ」「でんぱ組」を含む投稿を、出来事の当日と翌日で検索（ユウジ指示） */
   var p=e.date.split('-'),q,lab;
   if(p.length===2){   /* 日付が月までしか分からない出来事は、その月まるごとで検索 */
     var m0=new Date(Date.UTC(+p[0],+p[1]-1,1)),m1=new Date(Date.UTC(+p[0],+p[1],1));
-    q='("でんぱ" OR "でんぱ組") since:'+m0.toISOString().slice(0,10)+' until:'+m1.toISOString().slice(0,10);
-    return '<h5 class="refh">当時のTwitter/Xの反応</h5><p class="react"><a href="https://x.com/search?q='+encodeURIComponent(q)+'" target="_blank" rel="noopener">「でんぱ」「でんぱ組」を含む投稿（'+(+p[1])+'月中）↗</a></p>';}
+    q=reactTerms(e)+' since:'+m0.toISOString().slice(0,10)+' until:'+m1.toISOString().slice(0,10);
+    return '<h5 class="refh">当時のTwitter/Xの反応</h5><p class="react"><a href="https://x.com/search?q='+encodeURIComponent(q)+'" target="_blank" rel="noopener">'+reactLabel(e)+'（'+(+p[1])+'月中）↗</a></p>';}
   if(p.length<3)return '';
   var a=new Date(Date.UTC(+p[0],+p[1]-1,+p[2])),l=(e.date_last||e.date).split('-');
   var z=l.length===3?new Date(Date.UTC(+l[0],+l[1]-1,+l[2])):a,b=new Date(z.getTime()+2*864e5);
-  q='("でんぱ" OR "でんぱ組") since:'+a.toISOString().slice(0,10)+' until:'+b.toISOString().slice(0,10);
+  q=reactTerms(e)+' since:'+a.toISOString().slice(0,10)+' until:'+b.toISOString().slice(0,10);
   var c=new Date(b.getTime()-864e5);   /* until: はその日を含まない。表示は実際に含まれる最終日 */
   lab=(a.getUTCMonth()+1)+'/'+a.getUTCDate()+'〜'+(c.getUTCMonth()+1)+'/'+c.getUTCDate();
-  return '<h5 class="refh">当時のTwitter/Xの反応</h5><p class="react"><a href="https://x.com/search?q='+encodeURIComponent(q)+'" target="_blank" rel="noopener">「でんぱ」「でんぱ組」を含む投稿（'+lab+'）↗</a></p>';}
+  return '<h5 class="refh">当時のTwitter/Xの反応</h5><p class="react"><a href="https://x.com/search?q='+encodeURIComponent(q)+'" target="_blank" rel="noopener">'+reactLabel(e)+'（'+lab+'）↗</a></p>';}
 function detailHTML(y,e){
   /* 参考URL：「出典元の名前：リンク」を縦に並べる。Wikipediaは全件同じ記事なので行の札（WP）だけで示す */
   var L=[];Object.keys(SRC).forEach(function(c){e.src.forEach(function(s){if(s.c===c&&c!=='wikipedia')L.push(s);});});
