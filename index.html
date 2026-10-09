@@ -70,6 +70,9 @@ a{color:inherit}
 .hero .stat b{color:var(--ink);font-weight:700;font-size:15px;font-variant-numeric:tabular-nums;margin-right:4px}
 .navlinks .short{display:none}
 @media (max-width:640px){.navin{gap:6px}.logo{font-size:12.5px;gap:5px;letter-spacing:0}.logo svg{width:18px;height:18px}.navlinks{gap:0}.navlinks a{padding:5px 7px;font-size:12px}.navlinks .full{display:none}.navlinks .short{display:inline}}
+.navlinks a,.logo{white-space:nowrap}
+.navlinks .xs{display:none}
+@media (max-width:380px){.navlinks a{padding:5px 6px}.navlinks .short:has(+.xs){display:none}.navlinks .xs{display:inline}}   /* 狭い画面では「追加依頼」→「追加」 */
 @media (max-width:350px){.navlinks .hide-xs{display:none}}
 .nav{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .btn{font:inherit;font-size:13px;color:var(--ink);background:rgba(255,255,255,.04);border:1px solid var(--rule);border-radius:6px;padding:6px 12px;cursor:pointer;text-decoration:none}
@@ -166,6 +169,9 @@ a{color:inherit}
 .react a{display:inline-block;font-size:13px;color:#fff;text-decoration:none;background:rgba(143,216,255,.12);border:1px solid rgba(143,216,255,.4);border-radius:999px;padding:4px 12px}
 .react a:hover{background:rgba(143,216,255,.22)}
 .detail .refs+.refh,.detail .react+.refh{margin-top:14px}
+.fix{margin:14px 0 0;padding-top:10px;border-top:1px dashed rgba(143,216,255,.25);font-size:12.5px;color:var(--muted)}
+.fix a{color:var(--ink2);text-decoration:none;border:1px solid var(--rule);border-radius:999px;padding:3px 11px;margin-left:6px;white-space:nowrap}
+.fix a:hover{color:#fff;border-color:var(--ink2)}
 .tags{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
 .detail .refs+.refh,.detail .note+.refh{margin-top:14px}
 .tags a{display:inline-block;font-size:13px;font-weight:700;color:var(--pink);text-decoration:none;background:rgba(255,143,200,.12);border:1px solid rgba(255,143,200,.35);border-radius:999px;padding:3px 11px}
@@ -213,7 +219,7 @@ dialog#about::backdrop{background:rgba(6,6,20,.66);backdrop-filter:blur(3px)}
     <a class="logo" href="./" id="home" aria-label="でんぱぁかしっくれこーど.net 最初の画面へ">
       <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M19.4 2.8 7.6 18h6.8l-2.7 11.2L24.4 14h-7l2-11.2z" fill="#f08cbc"/></svg>
       <span>でんぱぁかしっくれこーど.net</span></a>
-    <div class="navlinks"><a href="#ov" data-jump="ov" class="hide-xs">年表</a><a href="#zm" data-jump="zm"><span class="full">出来事一覧</span><span class="short">一覧</span></a><a href="#about" id="about-open"><span class="full">この年表について</span><span class="short">概要</span></a></div>
+    <div class="navlinks"><a href="#ov" data-jump="ov" class="hide-xs">年表</a><a href="https://docs.google.com/forms/d/e/1FAIpQLSdhK88hFdk-dVGe9rwBrvA7ei4k6CZ82VhLE4NVp7_iqsXwtw/viewform" target="_blank" rel="noopener" title="年表に載っていない出来事を知らせる（Googleフォーム）"><span class="full">出来事の追加依頼</span><span class="short">追加依頼</span><span class="xs">追加</span></a><a href="#about" id="about-open"><span class="full">この年表について</span><span class="short">概要</span></a></div>
   </div></nav>
 <header class="top">
 
@@ -387,13 +393,25 @@ function reactHTML(e){   /* 当時のTwitter/Xの反応：「でんぱ」「で�
   var c=new Date(b.getTime()-864e5);   /* until: はその日を含まない。表示は実際に含まれる最終日 */
   lab=(a.getUTCMonth()+1)+'/'+a.getUTCDate()+'〜'+(c.getUTCMonth()+1)+'/'+c.getUTCDate();
   return '<h5 class="refh">当時のTwitter/Xの反応</h5><p class="react"><a href="https://x.com/search?q='+encodeURIComponent(q)+'" target="_blank" rel="noopener">'+reactLabel(e)+'（'+lab+'）↗</a></p>';}
+/* 誤りの報告：Googleフォーム（修正依頼）を、この出来事の情報を入れた状態で開く（ユウジ作成 2026-10-09） */
+var FIXFORM='https://docs.google.com/forms/d/e/1FAIpQLSeFt6trD9maUTnRpZKrIniH9B8Inr8Xj2e6i0PExzihs7ilmw/viewform';
+var SITE='https://wwdmp.github.io/dempakashic-records/';
+function fixHTML(y,e){
+  var p=parts(e.date),d=p.y+(p.hasMon?'/'+p.m:'')+(p.hasDay?'/'+p.d:'');
+  if(e.date_last&&e.date_last!==e.date){var q=parts(e.date_last);d+='〜'+q.y+'/'+q.m+'/'+q.d;}
+  var info=['日付：'+d,'種別：'+(KIND[e.kind]||e.kind),'重要度：'+(IMP[e.imp]||'★')];
+  if(e.venue)info.push('会場：'+e.venue);
+  if(e.perf.length)info.push('出演：'+e.perf.join('・'));
+  var q='?usp=pp_url&entry.789594252='+encodeURIComponent(e.title)+'&entry.1667188446='+encodeURIComponent(info.join('\n'))+
+    '&entry.943135187='+encodeURIComponent(SITE+'#'+e._y+'/'+e.id)+'&entry.2087164705='+encodeURIComponent(e.id);
+  return '<p class="fix">内容に誤りがありますか？<a href="'+FIXFORM+q+'" target="_blank" rel="noopener">誤りを報告する ↗</a></p>';}
 function detailHTML(y,e){
   /* 参考URL：「出典元の名前：リンク」を縦に並べる。Wikipediaは全件同じ記事なので行の札（WP）だけで示す */
   var L=[];Object.keys(SRC).forEach(function(c){e.src.forEach(function(s){if(s.c===c&&c!=='wikipedia')L.push(s);});});
   var T=e.tags?'<h5 class="refh">ハッシュタグ</h5><ul class="tags">'+e.tags.map(function(t){
       return '<li><a href="'+xsearch(t,e.date)+'" target="_blank" rel="noopener">#'+esc(t)+' ↗</a></li>';}).join('')+'</ul>':'';
   var R=reactHTML(e);
-  T=R+T;
+  T=R+T+fixHTML(y,e);
   if(!L.length)return '<div class="detail"><p class="note">Wikipedia「でんぱ組.inc」にだけ載っている出来事です。</p>'+T+'</div>';
   return '<div class="detail"><h5 class="refh">参考URL</h5><ul class="refs">'+L.map(function(s){
     var name=s.c==='media'?s.n:(s.n||SRC[s.c]),text;
